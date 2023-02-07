@@ -10,7 +10,7 @@ if (!File.Exists(filePath))
 
 using var fileStream = File.OpenRead(filePath);
 
-var orcReader = new OrcFileReader(fileStream, CancellationToken.None, 0);
+var orcReader = new OrcFileReader(fileStream, CancellationToken.None);
 
 var newFileName = Path.ChangeExtension(filePath, ".orc.xlsx");
 
