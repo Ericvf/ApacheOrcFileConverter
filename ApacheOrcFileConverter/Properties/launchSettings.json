@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ApacheOrcFileConverter": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\efegg\\Desktop\\test.orc\""
+    }
+  }
+}
