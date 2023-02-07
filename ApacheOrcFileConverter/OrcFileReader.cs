@@ -1,5 +1,4 @@
-﻿using Accessibility;
-using ApacheOrcDotNet;
+﻿using ApacheOrcDotNet;
 using ApacheOrcDotNet.ColumnTypes;
 using System.Data;
 using BinaryReader = ApacheOrcDotNet.ColumnTypes.BinaryReader;
@@ -20,14 +19,13 @@ public class OrcFileReader : IDataReader
     private ulong stripeRowIndex = 0;
     private readonly ulong totalAmountOfRecords = 0;
 
-    public OrcFileReader(Stream stream, CancellationToken cancellationToken, long skipLineAfterHeaders = 0)
+    public OrcFileReader(Stream stream, CancellationToken cancellationToken)
     {
         _cancellationToken = cancellationToken;
         _fileTail = new FileTail(stream);
 
         if (_fileTail.Stripes.Count == 0)
         {
-            // No stripes == no rows in the file
             return;
         }
 
@@ -37,40 +35,14 @@ public class OrcFileReader : IDataReader
 
         _types = _fileTail.Footer.Types.Select(t => t.Kind).ToArray();  
 
-        // Arbitrary part support
-        if (skipLineAfterHeaders > 0)
-        {
-            totalAmountOfRecords -= (ulong)skipLineAfterHeaders;
-            while (skipLineAfterHeaders > 0)
-            {
-                var stripe = _fileTail.Stripes[stripeIndex];
-                if ((ulong)skipLineAfterHeaders >= stripe.NumRows)
-                {
-                    skipLineAfterHeaders = (long)((ulong)skipLineAfterHeaders - stripe.NumRows);
-
-                    stripeRowIndex = 0;
-                    stripeIndex++;
-                }
-                else
-                {
-                    stripeRowIndex = (ulong)skipLineAfterHeaders - 1;
-                    skipLineAfterHeaders = 0;
-                }
-            }
-        }
-
         InitializeColumnReaders();
     }
 
-#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
     public int Depth => throw new NotImplementedException();
-#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
 
     public int FieldCount { get; }
 
-#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
     public bool IsClosed => throw new NotImplementedException();
-#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
 
     public int RecordsAffected => 0;
 
@@ -80,9 +52,7 @@ public class OrcFileReader : IDataReader
 
     public object this[int i] => GetValue(i);
 
-#pragma warning disable CA1065 // Do not raise exceptions in unexpected locations
     public object this[string name] => throw new NotImplementedException();
-#pragma warning restore CA1065 // Do not raise exceptions in unexpected locations
 
     public void Close()
     {
